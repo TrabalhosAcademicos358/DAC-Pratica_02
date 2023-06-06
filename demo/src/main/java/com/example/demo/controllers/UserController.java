@@ -1,9 +1,9 @@
 package com.example.demo.controllers;
 
-import com.example.demo.exceptions.UserNotFoundException;
+import com.example.demo.repositories.UserRepository;
+import com.example.demo.services.UserServices;
 
 import com.example.demo.models.UserModel;
-import com.example.demo.repositories.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,46 +13,34 @@ import java.util.UUID;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/users")
 public class UserController {
-    final UserRepository repository;
+    final UserServices services;
 
-    public UserController(UserRepository userRepository) {
-        this.repository = userRepository;
+    public UserController(UserServices userServices) {
+        this.services = userServices;
     }
 
     @GetMapping
     public List<UserModel> getAll() {
-        return repository.findAll();
+        return services.getAll();
     }
 
     @GetMapping("/{id}")
     public UserModel getOne(@PathVariable UUID id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+        return services.getOne(id);
     }
 
     @PostMapping
     public UserModel saveOne(@RequestBody UserModel newUser) {
-        return repository.save(newUser);
+        return services.create(newUser);
     }
 
     @PutMapping("/{id}")
     public UserModel updateOne(@RequestBody UserModel newUser, @PathVariable UUID id) {
-    return repository.findById(id)
-      .map(user -> {
-        user.setNome(newUser.getNome());
-        user.setIdade(newUser.getIdade());
-        user.setSexo(newUser.getSexo());
-        user.setProfissao(newUser.getProfissao());
-        return repository.save(user);
-      })
-      .orElseGet(() -> {
-        newUser.setId(id);
-        return repository.save(newUser);
-      });
+        return services.updateOnePut(newUser, id);
     }
 
     @DeleteMapping("/{id}")
     public void deleteOne(@PathVariable UUID id) {
-        repository.deleteById(id);
+        services.deleteOne(id);
     }
 }

@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
     final UserRepository repository;
 
@@ -31,7 +31,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserModel saveUser(@RequestBody UserModel newUser) {
+    public UserModel saveOne(@RequestBody UserModel newUser) {
         return repository.save(newUser);
     }
 
